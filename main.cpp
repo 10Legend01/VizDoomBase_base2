@@ -29,7 +29,7 @@ int main() {
 
     // Create DoomGame instance. It will run the game and communicate with you.
     auto *game = new DoomGame();
-    game->loadConfig("basic1.cfg");
+    game->loadConfig("health_gathering.cfg");
     game->init();
 
 
@@ -49,9 +49,9 @@ int main() {
         actions[i] = action;
     }*/
 
-    actions[0] = {0, 1, 0, 0};
-    actions[1] = {1, 0, 0, 0};
-    actions[2] = {0, 0, 0, 1};
+    actions[0] = {0, 0, 1, 0}; //right
+    actions[1] = {0, 1, 0, 0}; //left
+    actions[2] = {1, 0, 0, 0}; //attack
 
 
     std::srand(time(nullptr));
@@ -66,10 +66,10 @@ int main() {
     Mat diff(game->getScreenHeight(), game->getScreenWidth(), CV_8UC3);
     Mat1b prev(game->getScreenHeight(), game->getScreenWidth(), CV_8UC3);
 
-    const int d = 150;
+    const int d = 180;
 
     double itog = 0;
-    for (int i = 0; i < 20; ++i) {
+    for (int i = 0; i < 1; ++i) {
 
         std::cout << "Episode #" << i + 1 << "\n";
 
@@ -137,20 +137,31 @@ int main() {
                 middles[k].x /= count[k];
                 middles[k].y /= count[k];
 
-                if(middles[k].y > 0.56 * game->getScreenHeight()) {
+                if(middles[k].y > 0.8 * game->getScreenHeight()) {
                     middles.erase(middles.begin() + k--);
                     nLabels--;
                 }
             }
-
+            /*
             if(middles[0].x < game->getScreenWidth() / 2 - 25)
                 std::cout << game->makeAction(actions[1]) << ' ';
             else if (middles[0].x > game->getScreenWidth() / 2 + 25)
                 std::cout << game->makeAction(actions[0]) << ' ';
             else
                 std::cout << game->makeAction(actions[2]) << ' ';
-
-
+            */
+            bool ff= false;
+            for (int v=0;v<middles.size();v++) {
+                if ((middles[v].x > game->getScreenWidth() / 2 - 15) and
+                    (middles[v].x < game->getScreenWidth() / 2 + 15)) {
+                        game->makeAction(actions[0]);
+                        ff=true;
+                        break;
+                }
+            }
+            if (!ff)
+                game->makeAction(actions[1]);
+            ///std::cout << game->makeAction({0,0,0,z}) << ' ';
 
             /*std::vector<Vec3b> colors;
             for (int k = 0; k < nLabels; ++k) {
@@ -166,7 +177,6 @@ int main() {
 
             std::cout << nLabels << std::endl;*/
 
-            waitKey(30);
 
             // Make random action and get reward
 
